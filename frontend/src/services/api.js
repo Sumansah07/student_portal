@@ -1,15 +1,8 @@
 import axios from 'axios';
 
-// Get API URL from runtime config (loaded from public/config.js)
-// Falls back to environment variable or localhost
-const getApiUrl = () => {
-  if (window.APP_CONFIG?.API_URL) {
-    return window.APP_CONFIG.API_URL;
-  }
-  return import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
-};
+// Get API URL from runtime config (which reads from VITE_API_URL env var)
+const API_BASE_URL = window.APP_CONFIG?.API_URL || 'http://localhost:5000/api';
 
-const API_BASE_URL = getApiUrl();
 console.log('🔗 API Base URL:', API_BASE_URL);
 
 const api = axios.create({
