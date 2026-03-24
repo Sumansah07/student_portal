@@ -35,8 +35,17 @@ app.use('/api/student', require('./routes/student'));
 app.use('/api/faculty', require('./routes/faculty'));
 app.use('/api/admin', require('./routes/admin'));
 
-// Health check with database verification
-app.get('/health', async (req, res) => {
+// Lightweight health check (no database query)
+app.get('/health', (req, res) => {
+  res.json({ 
+    status: 'OK', 
+    message: 'NIC Portal API is running',
+    timestamp: new Date().toISOString()
+  });
+});
+
+// Detailed health check with database verification (optional)
+app.get('/health/detailed', async (req, res) => {
   try {
     const result = await db.query('SELECT NOW()');
     res.json({ 
