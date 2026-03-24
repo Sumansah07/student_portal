@@ -1,13 +1,14 @@
 const express = require('express');
 const cors = require('cors');
 require('dotenv').config();
+const db = require('./config/database');
 
 const app = express();
 
 // CORS Configuration - supports multiple origins
 const corsOrigins = process.env.CORS_ORIGIN 
   ? process.env.CORS_ORIGIN.split(',').map(origin => origin.trim())
-  : ['http://localhost:3000'];
+  : ['http://localhost:5173'];
 
 app.use(cors({
   origin: function(origin, callback) {
@@ -34,9 +35,25 @@ app.use('/api/student', require('./routes/student'));
 app.use('/api/faculty', require('./routes/faculty'));
 app.use('/api/admin', require('./routes/admin'));
 
-// Health check
-app.get('/health', (req, res) => {
-  res.json({ status: 'OK', message: 'NIC Portal API is running' });
+// Health check with database verification
+app.get('/health', async (req, res) => {
+  try {
+    const result = await db.query('SELECT NOW()');
+    res.json({ 
+      status: 'OK', 
+      message: 'NIC Portal API is running',
+      database: 'connected',
+      timestamp: result.rows[0].now
+    });
+  } catch (err) {
+    console.error('Database health check failed:', err.message);
+    res.status(503).json({ 
+      status: 'ERROR', 
+      message: 'NIC Portal API is running but database is not connected',
+      database: 'disconnected',
+      error: err.message
+    });
+  }
 });
 
 // Error handler
