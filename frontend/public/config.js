@@ -1,7 +1,5 @@
-// Runtime configuration - reads from environment variables
-// This allows changing API URL without rebuilding
+// Runtime configuration - loaded at runtime, not build time
 window.APP_CONFIG = {
-  API_URL: import.meta.env.VITE_API_URL || 'http://localhost:5000/api'
+  API_URL: 'https://student-portal-irk5.onrender.com/api'
+  // For local development, change to: 'http://localhost:5000/api'
 };
-
-console.log('📋 Runtime Config:', window.APP_CONFIG);
