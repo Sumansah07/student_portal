@@ -1,8 +1,16 @@
 import axios from 'axios';
 
-// Use environment variable for API URL, fallback to localhost for development
-// Vite uses import.meta.env instead of process.env
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
+// Get API URL from runtime config (loaded from public/config.js)
+// Falls back to environment variable or localhost
+const getApiUrl = () => {
+  if (window.APP_CONFIG?.API_URL) {
+    return window.APP_CONFIG.API_URL;
+  }
+  return import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
+};
+
+const API_BASE_URL = getApiUrl();
+console.log('🔗 API Base URL:', API_BASE_URL);
 
 const api = axios.create({
   baseURL: API_BASE_URL,

@@ -110,7 +110,11 @@ function StudentDashboard() {
     }
     
     return attendance.attendance.filter(record => {
-      const recordDate = new Date(record.date).toISOString().split('T')[0];
+      // Handle both 'date' and 'DATE' column names, and null values
+      const dateValue = record.date || record.DATE;
+      if (!dateValue) return false;
+      
+      const recordDate = new Date(dateValue).toISOString().split('T')[0];
       return recordDate === selectedDate;
     });
   };

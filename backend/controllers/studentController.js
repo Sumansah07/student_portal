@@ -61,7 +61,7 @@ exports.getAttendance = async (req, res) => {
        FROM attendance a
        JOIN courses c ON a.course_id = c.id
        WHERE a.student_id = $1
-       ORDER BY a.date DESC`,
+       ORDER BY a."DATE" DESC`,
       [student.rows[0].id]
     );
 
@@ -129,7 +129,7 @@ exports.getNotifications = async (req, res) => {
     
     const notifications = await db.query(
       `SELECT * FROM notifications 
-       WHERE is_active = TRUE 
+       WHERE is_active = 1 
        AND (target_role IN ('all', 'student'))
        AND (target_program = 'all' OR target_program = $1)
        ORDER BY created_at DESC

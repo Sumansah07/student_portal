@@ -14,7 +14,7 @@ exports.login = async (req, res) => {
 
     // Find user
     const result = await db.query(
-      'SELECT * FROM users WHERE email = $1 AND is_active = TRUE',
+      'SELECT * FROM users WHERE email = $1 AND is_active = 1',
       [email]
     );
 
