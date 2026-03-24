@@ -2,16 +2,14 @@ const { Pool } = require('pg');
 require('dotenv').config();
 const dns = require('dns');
 
-// CRITICAL FIX: Force IPv4 resolution
-// Supabase resolves to IPv6 but Node.js has issues with it
+// Force IPv4 resolution
 dns.setDefaultResultOrder('ipv4first');
 
 // Determine SSL configuration
 let sslConfig = false;
 if (process.env.DB_SSL === 'true' || process.env.DATABASE_URL) {
-  // Using Supabase - needs SSL with self-signed cert handling
   sslConfig = {
-    rejectUnauthorized: false  // Accept self-signed certificates
+    rejectUnauthorized: false
   };
 }
 
@@ -19,9 +17,11 @@ if (process.env.DB_SSL === 'true' || process.env.DATABASE_URL) {
 let poolConfig = {
   max: 20,
   idleTimeoutMillis: 30000,
-  connectionTimeoutMillis: 10000,
+  connectionTimeoutMillis: 30000,  // Increased from 10s to 30s for Render
   keepAlives: true,
   keepAliveInitialDelayMillis: 10000,
+  statement_timeout: 30000,  // Statement timeout
+  query_timeout: 30000,      // Query timeout
 };
 
 // Add connection parameters
@@ -35,7 +35,7 @@ if (process.env.DATABASE_URL) {
   poolConfig.database = process.env.DB_NAME || 'nic_portal';
   poolConfig.port = process.env.DB_PORT || 5432;
   poolConfig.ssl = sslConfig;
-  poolConfig.family = 4;  // Force IPv4 only
+  poolConfig.family = 4;
 }
 
 const pool = new Pool(poolConfig);
@@ -47,7 +47,7 @@ pool.on('connect', () => {
   if (!connectionTested) {
     connectionTested = true;
     console.log('✓ Database connected successfully');
-    console.log(`✓ Using ${process.env.DATABASE_URL ? 'Connection String' : 'Individual Parameters'}`);
+    console.log(`✓ Using ${process.env.DATABASE_URL ? 'Connection String (Pooler)' : 'Individual Parameters'}`);
   }
 });
 
